@@ -1,0 +1,14 @@
+{% extends 'base.html'%}
+{% block content %}
+<h1> Databases: </h1>
+
+<div>
+    {% for i in db %}
+    <div>
+        name: {{i.name}} 
+        created: {{i.create}} 
+        modified: {{i.change}}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

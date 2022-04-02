@@ -1,0 +1,10 @@
+<h1>Database:</h1>   
+<table>
+    {% for row in res %}    
+       <tr>
+       {% for val in row %}
+        <td>{{val}}</td>
+       {% endfor %}
+      </tr>
+    {% endfor %}
+</table> 

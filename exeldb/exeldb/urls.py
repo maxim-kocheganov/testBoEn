@@ -18,6 +18,9 @@ from django.urls import path
 from table import views as tw
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', tw.index)
+    path('admin/', admin.site.urls),    
+    path('search/', tw.bd_search),
+    path('show/<id>', tw.db_show),
+    path('upload/', tw.upload),
+    path('', tw.index),
 ]
