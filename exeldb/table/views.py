@@ -32,11 +32,11 @@ def db_show(request,id):
     maxColl = allCells.aggregate(Max('column'))["column__max"]
     maxRow = allCells.aggregate(Max('row'))["row__max"]
     res = []
-    for i in range(0,maxRow):
+    for i in range(1,maxRow + 1):
         row = []
-        for j in range(0,maxColl):
+        for j in range(1,maxColl + 1):
             try:          
-                cell = allCells.filter(row = i,column = j)            
+                cell = allCells.filter(row = i,column = j)[0]         
                 row.append(str(cell.Read()))
             except:
                 row.append(" ")       
