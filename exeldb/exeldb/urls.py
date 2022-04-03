@@ -22,6 +22,7 @@ urlpatterns = [
     path('search/', tw.bd_search),
     path('show/<id>', tw.db_show),
     path('upload/', tw.upload),
-    path('changeCell/', tw.changeCell),
+    path('changeCell/', tw.changeCell),    
+    path('download/<id>', tw.download),
     path('', tw.index),
 ]

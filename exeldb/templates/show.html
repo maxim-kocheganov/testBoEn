@@ -2,15 +2,25 @@
 {% block content %}
 <h1>Database:</h1> 
 <script>
-    
+    $("")
 </script>  
-<table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
-    {% for row in res %}    
-       <tr>
-       {% for val in row %}
-        <td class="mdl-data-table__cell">{{val}}</td>
-       {% endfor %}
-      </tr>
-    {% endfor %}
-</table> 
+<form action="changeCell">
+  <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+      {% for row in res %}    
+        <tr>
+        {% for val in row %}
+        <!-- changeCell/ -->
+          <!-- <td class="mdl-data-table__cell editField">{{val}}</td> -->
+          <td class="mdl-data-table__cell editField">
+            <input class="mdl-textfield__input" type="text" id="sample1" value="{{val}}">
+          </td>
+        {% endfor %}
+        </tr>
+      {% endfor %}
+  </table> 
+  <div class="card-square  mdl-shadow--2dp">
+    <input type="submit" value="Save" class="mdl-button mdl-js-button mdl-button--raised">
+  </div>
+</form>
+
 {% endblock %}

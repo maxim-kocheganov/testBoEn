@@ -9,7 +9,10 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect
 from openpyxl import Workbook,load_workbook
 import pytz
-
+import os
+from wsgiref.util import FileWrapper
+from django.conf import settings
+import mimetypes
 
 def index(request):
     return render(request, "index.html")
@@ -38,16 +41,19 @@ def bd_search(request):
                     if (change_or_edit == "changed"):
                         if (i.change >= after and i.change <= before):
                             db = {'name':i.name,'create':i.create,\
-                                'change':i.change,'link':'show/' + str(i.id)}
+                                'change':i.change,'link':'show/' + str(i.id),\
+                                'link_download' : 'download/' + str(i.id)}
                             dbs.append(db)
                     elif (change_or_edit == "created"):
                         if (i.create >= after and i.create <= before):
                             db = {'name':i.name,'create':i.create,\
-                                'change':i.change,'link':'show/' + str(i.id)}
+                                'change':i.change,'link':'show/' + str(i.id),\
+                                'link_download' : 'download/' + str(i.id)}
                             dbs.append(db)
                     else:
                         db = {'name':i.name,'create':i.create,\
-                                'change':i.change,'link':'show/' + str(i.id)}
+                                'change':i.change,'link':'show/' + str(i.id),\
+                                'link_download' : 'download/' + str(i.id)}
                         dbs.append(db)
         else:
             dbs_raw = m.DB.objects.all()
@@ -55,16 +61,19 @@ def bd_search(request):
                 if (change_or_edit == "changed"):
                     if (i.change >= after and i.change <= before):
                         db = {'name':i.name,'create':i.create,\
-                            'change':i.change,'link':'show/' + str(i.id)}
+                            'change':i.change,'link':'show/' + str(i.id),\
+                                'link_download' : 'download/' + str(i.id)}
                         dbs.append(db)
                 elif (change_or_edit == "created"):
                     if (i.create >= after and i.create <= before):
                         db = {'name':i.name,'create':i.create,\
-                            'change':i.change,'link':'show/' + str(i.id)}
+                            'change':i.change,'link':'show/' + str(i.id),\
+                                'link_download' : 'download/' + str(i.id)}
                         dbs.append(db)
                 else:
                     db = {'name':i.name,'create':i.create,\
-                            'change':i.change,'link':'show/' + str(i.id)}
+                            'change':i.change,'link':'show/' + str(i.id),\
+                                'link_download' : 'download/' + str(i.id)}
                     dbs.append(db)
         param = {'db':dbs}
         return render(request,"search_db.html",param)
@@ -116,7 +125,12 @@ def process(file):
 
 def changeCell(request):
     if request.method =="POST":
-        pass
+        row = request.POST["row"]
+        col = request.POST["col"]
+        var = request.POST["var"]
+        cell = m.Cell().objects.filter(row = row, column=col)
+        cell.Set(var)
+        cell.save()
     
 
 def upload(request):
@@ -130,6 +144,40 @@ def upload(request):
             return redirect('/show/' + str(db_id)) # go for an show and edit page
         else:
             return redirect('/')
+
+def download(request, id):
+    db = m.DB.objects.filter(id=id)[0]
+    wb = Workbook()
+    ws = wb.active
+
+    #### create xls
+    allCells = m.Cell.objects.filter(db = int(id))
+    maxColl = allCells.aggregate(Max('column'))["column__max"]
+    maxRow = allCells.aggregate(Max('row'))["row__max"]
+    if maxColl is None:
+        maxColl = 0
+    if maxRow is None:
+        maxRow = 0
+    for i in range(1,maxRow + 1):
+        for j in range(1,maxColl + 1):
+            try:          
+                cell = allCells.filter(row = i,column = j)[0]   
+                var = cell.Read()      
+                if var is not None:
+                    ws.cell(column=i, row=j, value=var)
+                else:
+                    pass
+            except:
+                pass
+
+    #### return xls via http
+    name = db.name
+    dest_filename = os.path.join(settings.BASE_DIR, 'media',  name)    
+    wb.save(filename = dest_filename)
+    file = open(dest_filename, 'rb')
+    response = HttpResponse(file.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(name)
+    return response
 
 # Прервись чтением исходников, уважаемый, лови анекдот:
 # Байден выступает перед журналистами:
