@@ -1,22 +1,46 @@
 {% extends 'base.html'%}
 {% block content %}
+<script>
+    $( function() {
+      $( "#datepicker_before" ).datepicker();
+      $( "#datepicker_after" ).datepicker();
+      $( "#db_change_or_edit" ).selectmenu();
+    } );
+</script>
 <h1>Welcome!</h1>
-<div>
-    <form action="/search/">
-        <label for="db">Db:</label>
-        <input id="db_name" type="text" name="db_name" value="{{ current_name }}">
-        <input type="submit" value="Search">
+<div class="card-square  mdl-shadow--2dp">     
+    <h4>Find</h4>   
+    <form class="mdl-grid" action="/search/">
+        <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col">
+            <label class="mdl-textfield__input" for="db" >Db name:</label>
+            <input class="mdl-textfield__input" id="db_name" type="text" name="db_name" value="">
+        </div>
+        <div class="mdl-cell mdl-cell--4-col">
+            <label class="mdl-textfield__input" for="db"  >Before:</label>            
+            <input class="mdl-textfield__input" type="text" id="datepicker_before" name="db_before">
+            <label class="mdl-textfield__input" for="db" >After:</label>
+            <input class="mdl-textfield__input" type="text" id="datepicker_after" name="db_after">
+            <label for="speed">Select range type</label>
+            <select name="db_change_or_edit" id="db_change_or_edit">
+                <option>changed</option>
+                <option selected="selected">created</option>
+            </select>
+        </div>
+        <div class="mdl-cell mdl-cell--4-col" style="text-align: center; margin: auto;">
+            <input type="submit" value="Search" class="mdl-button mdl-js-button mdl-button--raised">
+        </div>
     </form>
 </div>
-<div>
-    <form method="post" action="/upload/" enctype="multipart/form-data">
+<div class="card-square  mdl-shadow--2dp">
+    <h4>Upload</h4>
+    <form class="mdl-grid" method="post" action="/upload/" enctype="multipart/form-data">
         {% csrf_token %}
-        <label for="excel">excel:</label>
-        <input type="file" name="excel_file">
-        <button type="submit">Upload</button>
-        <input type="checkbox" id="scales" name="to_edit"
+        <label class="mdl-textfield__input" for="excel">excel:</label>
+        <input class="mdl-textfield__input" type="file" name="excel_file">
+        <button class="mdl-textfield__input" type="submit">Upload</button>
+        <input class="" type="checkbox" id="scales" name="to_edit"
          checked>
-        <label for="scales">To edit after uploading</label>
+        <label class="" for="scales">To edit after uploading</label>
     </form>
 </div>
 {% endblock %}

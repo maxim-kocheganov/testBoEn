@@ -1,10 +1,16 @@
-<h1>Database:</h1>   
-<table>
+{% extends 'base.html'%}
+{% block content %}
+<h1>Database:</h1> 
+<script>
+    
+</script>  
+<table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
     {% for row in res %}    
        <tr>
        {% for val in row %}
-        <td>{{val}}</td>
+        <td class="mdl-data-table__cell">{{val}}</td>
        {% endfor %}
       </tr>
     {% endfor %}
 </table> 
+{% endblock %}

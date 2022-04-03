@@ -14,17 +14,20 @@ class Type(enum.IntEnum):
     integer = 1
     string = 2
     date = 3
+    null = 4
 
 class Cell(models.Model):    
     id = models.IntegerField(primary_key=True)
     row = models.IntegerField()
     column = models.IntegerField()
     type = models.IntegerField()
-    data = models.TextField(blank=True)
+    data = models.TextField(blank=True, null=True)
     db = models.ForeignKey(
         DB,
         on_delete=models.CASCADE)
     def Set(self,var):
+        if var is None:
+            self.type = Type.null
         if type(var) == int:
             self.type = Type.integer
             self.data = base64.b64encode(struct.pack('i', var)).decode("utf-8")
@@ -37,4 +40,5 @@ class Cell(models.Model):
             return base64.b64decode(self.data.encode("utf-8")).decode('utf-8')
         elif self.type == Type.integer:
             return struct.unpack('i',base64.b64decode(self.data.encode("utf-8")))[0]
-        
+        elif self.type == Type.null:
+            return None
