@@ -17,8 +17,7 @@
   }
   $( document ).ready(init);
 </script>  
-
-<h1>Database:</h1> 
+<h2>Database:</h2> 
 <script>
   // Change cell
   function init() {
@@ -33,7 +32,12 @@
   }
   $( document ).ready(init);
 </script>  
-
+<form method="post" action="/changeName/">
+  {% csrf_token %}
+  <input name="name" class="mdl-textfield__input" type="text" id="" value="{{act.name}}"/>
+  <input name="db_id" class="mdl-textfield__input" type="text" id="" value="{{db_id}}" hidden=True/>
+  <button class="" type="submit">Change name</button>
+</form> 
 <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
     {% for row in res %}    
       <tr>
@@ -48,10 +52,8 @@
     {% endfor %}
 </table> 
 <div id="div_{{act.link_id}}">
-  name: {{act.name}} 
-  created: {{act.create}} 
-  modified: {{act.change}}
-  <a href="/{{act.link}}">View & Edit</a>
+  <b>created:</b> {{act.create}} 
+  <b>modified:</b> {{act.change}}
   <a href="/{{act.link_download}}">Download</a>      
   <a class="delete_class" data-id="{{act.link_id}}">Delete</a>
 </div>

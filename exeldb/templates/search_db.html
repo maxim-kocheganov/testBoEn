@@ -15,15 +15,49 @@
     }
     $( document ).ready(init);
 </script>  
-  
-<h1> Databases: </h1>
+<h2> Databases: </h2>
+
+<div class="card-square  mdl-shadow--2dp">     
+  <h4>Find</h4>   
+  <form class="mdl-grid" action="/search/">
+      <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col">
+          <label class="mdl-textfield__input" for="db" >Db name:</label>
+          <input class="mdl-textfield__input" id="db_name" type="text" name="db_name" value="">
+      </div>
+      <div class="mdl-cell mdl-cell--4-col">
+          <label class="mdl-textfield__input" for="db"  >Before:</label>            
+          <input class="mdl-textfield__input" type="text" id="datepicker_before" name="db_before">
+          <label class="mdl-textfield__input" for="db" >After:</label>
+          <input class="mdl-textfield__input" type="text" id="datepicker_after" name="db_after">
+          <label>Select range type</label>
+          <select name="db_change_or_edit" id="db_change_or_edit">
+              <option>changed</option>
+              <option selected="selected">created</option>
+          </select>
+          <label>Order by</label>
+          <select name="db_order_by" id="db_change_or_edit">
+            <option>changed</option>
+            <option selected="selected">created</option>
+            <option>name</option>
+          </select>
+          <label>Order</label>
+          <select name="db_order_type" id="db_change_or_edit">
+            <option>descending</option>
+            <option>ascending</option>
+          </select>
+      </div>
+      <div class="mdl-cell mdl-cell--4-col" style="text-align: center; margin: auto;">
+          <input type="submit" value="Search" class="mdl-button mdl-js-button mdl-button--raised">
+      </div>
+  </form>
+</div>
 
 <div>
     {% for i in db %}
     <div id="div_{{i.link_id}}">
-        name: {{i.name}} 
-        created: {{i.create}} 
-        modified: {{i.change}}
+        <b>name:</b> {{i.name}} 
+        <b>created:</b> {{i.create}} 
+        <b>modified:</b> {{i.change}}
         <a href="/{{i.link}}">View & Edit</a>
         <a href="/{{i.link_download}}">Download</a>      
         <a class="delete_class" data-id="{{i.link_id}}">Delete</a>

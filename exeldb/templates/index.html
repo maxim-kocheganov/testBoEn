@@ -7,29 +7,9 @@
       $( "#db_change_or_edit" ).selectmenu();
     } );
 </script>
-<h1>Welcome!</h1>
-<div class="card-square  mdl-shadow--2dp">     
-    <h4>Find</h4>   
-    <form class="mdl-grid" action="/search/">
-        <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col">
-            <label class="mdl-textfield__input" for="db" >Db name:</label>
-            <input class="mdl-textfield__input" id="db_name" type="text" name="db_name" value="">
-        </div>
-        <div class="mdl-cell mdl-cell--4-col">
-            <label class="mdl-textfield__input" for="db"  >Before:</label>            
-            <input class="mdl-textfield__input" type="text" id="datepicker_before" name="db_before">
-            <label class="mdl-textfield__input" for="db" >After:</label>
-            <input class="mdl-textfield__input" type="text" id="datepicker_after" name="db_after">
-            <label for="speed">Select range type</label>
-            <select name="db_change_or_edit" id="db_change_or_edit">
-                <option>changed</option>
-                <option selected="selected">created</option>
-            </select>
-        </div>
-        <div class="mdl-cell mdl-cell--4-col" style="text-align: center; margin: auto;">
-            <input type="submit" value="Search" class="mdl-button mdl-js-button mdl-button--raised">
-        </div>
-    </form>
+<h2>Welcome!</h2>
+<div "card-square  mdl-shadow--2dp">    
+    <a href="/search/"><h4>View all & search</h4></a>
 </div>
 <div class="card-square  mdl-shadow--2dp">
     <h4>Upload</h4>

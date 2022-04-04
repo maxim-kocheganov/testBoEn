@@ -5,14 +5,12 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import table.models as m
 from django.db.models import Max
-from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect
 from openpyxl import Workbook,load_workbook
 import pytz
 import os
-from wsgiref.util import FileWrapper
 from django.conf import settings
-import mimetypes
+from django.shortcuts import redirect
 
 def index(request):
     return render(request, "index.html")
@@ -30,6 +28,7 @@ def bd_search(request):
         before = request.GET.get("db_before", "")
         after = request.GET.get("db_after", "")
         change_or_edit = request.GET.get("db_change_or_edit", "change")
+        db_order_by = request.GET.get("db_order_by","name")
         if before != "":
             before = datetime.strptime(before, '%d/%m/%Y')
         else:
@@ -40,31 +39,49 @@ def bd_search(request):
             after = datetime.min
         before = pytz.utc.localize(before)
         after = pytz.utc.localize(after)
-        dbs = []
-        if name != "":
-            dbs_raw = m.DB.objects.all()
+        db_order_by = request.GET.get("db_order_by", "name")
+        db_order_type = request.GET.get("db_order_type", "ascending")
+        dbs1 = []
+        dbs_raw = m.DB.objects.all()
+
+        # Order 
+        if db_order_by == "changed" and db_order_type == "ascending":
+            dbs_raw = dbs_raw.order_by("change")
+        elif db_order_by == "changed" and db_order_type == "descending":
+            dbs_raw = dbs_raw.order_by("-change")
+        if db_order_by == "created" and db_order_type == "ascending":
+            dbs_raw = dbs_raw.order_by("create")
+        elif db_order_by == "created" and db_order_type == "descending":
+            dbs_raw = dbs_raw.order_by("-create")
+        if db_order_by == "name" and db_order_type == "ascending":
+            dbs_raw = dbs_raw.order_by("name")
+        elif db_order_by == "name" and db_order_type == "descending":
+            dbs_raw = dbs_raw.order_by("-name")
+        
+        # Find by name and time range
+        if name != "":            
             for i in dbs_raw:
                 if (i.name.find(name) != -1):
                     if (change_or_edit == "changed"):
                         if (i.change >= after and i.change <= before):
-                            dbs.append(fill(i))
+                            dbs1.append(fill(i))
                     elif (change_or_edit == "created"):
                         if (i.create >= after and i.create <= before):
-                           dbs.append(fill(i))
+                           dbs1.append(fill(i))
                     else:
-                        dbs.append(fill(i))
+                        dbs1.append(fill(i))
         else:
-            dbs_raw = m.DB.objects.all()
             for i in dbs_raw:            
                 if (change_or_edit == "changed"):
                     if (i.change >= after and i.change <= before):
-                        dbs.append(fill(i))
+                        dbs1.append(fill(i))
                 elif (change_or_edit == "created"):
                     if (i.create >= after and i.create <= before):
-                        dbs.append(fill(i))
+                        dbs1.append(fill(i))
                 else:
-                    dbs.append(fill(i))
-        param = {'db':dbs}
+                    dbs1.append(fill(i))
+        
+        param = {'db':dbs1}
         return render(request,"search_db.html",param)
 
 def delete(request,id):
@@ -104,7 +121,11 @@ def db_show(request,id):
         res.append(row)
 
     # Actions for a list
-    db = m.DB.objects.filter(id=int(id))[0]
+    db = m.DB.objects.filter(id=int(id))
+    if not db:
+        return render(request,"404.html")
+    else:
+        db = db[0]
     act = {'name':db.name,'create':db.create,\
                 'change':db.change,\
                 'link_download' : 'download/' + str(db.id),\
@@ -165,6 +186,15 @@ def changeCell(request):
             cell.save()
     return HttpResponse(status=200)
     
+def changeName(request):
+    if request.method =='POST':
+        name = request.POST["name"]
+        db_id = request.POST["db_id"]
+        db_id = int(db_id)
+        db = m.DB.objects.filter(id=db_id)[0]
+        db.name = name
+        db.save()
+        return  redirect("/show/" + str(db_id))
 
 def upload(request):
     if request.method =='POST':

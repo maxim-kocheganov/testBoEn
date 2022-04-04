@@ -16,6 +16,8 @@ class Type(enum.IntEnum):
     date = 3
     null = 4
 
+# Type-packed version
+"""
 class Cell(models.Model):    
     id = models.IntegerField(primary_key=True)
     row = models.IntegerField()
@@ -42,3 +44,19 @@ class Cell(models.Model):
             return struct.unpack('i',base64.b64decode(self.data.encode("utf-8")))[0]
         elif self.type == Type.null:
             return None
+"""
+
+class Cell(models.Model):    
+    id = models.IntegerField(primary_key=True)
+    row = models.IntegerField()
+    column = models.IntegerField()
+    type = models.IntegerField(blank=True, null=True)
+    data = models.TextField(blank=True, null=True)
+    db = models.ForeignKey(
+        DB,
+        on_delete=models.CASCADE)
+    def Set(self,var):
+        self.data = str(var)
+
+    def Read(self):
+        return self.data

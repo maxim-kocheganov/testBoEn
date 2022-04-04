@@ -25,5 +25,6 @@ urlpatterns = [
     path('changeCell/', tw.changeCell),    
     path('download/<id>', tw.download),
     path('delete/<id>', tw.delete),
+    path('changeName/', tw.changeName),
     path('', tw.index),
 ]
