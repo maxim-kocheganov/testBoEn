@@ -1,15 +1,32 @@
 {% extends 'base.html'%}
 {% block content %}
+<script>
+    function init() {
+        // Delete on backend
+      $('.delete_class').click(function() {
+        $.ajax({
+          type: "POST",
+          url: "/delete/" + $(this).data( "id" ),
+          data: { csrfmiddlewaretoken : "{{ csrf_token }}"}
+        })
+        // Remove entry on page
+        $("#div_" + $(this).data( "id" )).remove();
+      });    
+    }
+    $( document ).ready(init);
+</script>  
+  
 <h1> Databases: </h1>
 
 <div>
     {% for i in db %}
-    <div>
+    <div id="div_{{i.link_id}}">
         name: {{i.name}} 
         created: {{i.create}} 
         modified: {{i.change}}
         <a href="/{{i.link}}">View & Edit</a>
-        <a href="/{{i.link_download}}">Download</a>
+        <a href="/{{i.link_download}}">Download</a>      
+        <a class="delete_class" data-id="{{i.link_id}}">Delete</a>
     </div>
     {% endfor %}
 </div>

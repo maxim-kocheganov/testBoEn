@@ -18,6 +18,13 @@ def index(request):
     return render(request, "index.html")
 
 def bd_search(request):
+    def fill(i):
+        if (i.change >= after and i.change <= before):
+            db = {'name':i.name,'create':i.create,\
+                'change':i.change,'link':'show/' + str(i.id),\
+                'link_download' : 'download/' + str(i.id),\
+                'link_id' : str(i.id)}
+        return db
     if request.method =="GET":
         name = request.GET.get("db_name", "")
         before = request.GET.get("db_before", "")
@@ -40,49 +47,47 @@ def bd_search(request):
                 if (i.name.find(name) != -1):
                     if (change_or_edit == "changed"):
                         if (i.change >= after and i.change <= before):
-                            db = {'name':i.name,'create':i.create,\
-                                'change':i.change,'link':'show/' + str(i.id),\
-                                'link_download' : 'download/' + str(i.id)}
-                            dbs.append(db)
+                            dbs.append(fill(i))
                     elif (change_or_edit == "created"):
                         if (i.create >= after and i.create <= before):
-                            db = {'name':i.name,'create':i.create,\
-                                'change':i.change,'link':'show/' + str(i.id),\
-                                'link_download' : 'download/' + str(i.id)}
-                            dbs.append(db)
+                           dbs.append(fill(i))
                     else:
-                        db = {'name':i.name,'create':i.create,\
-                                'change':i.change,'link':'show/' + str(i.id),\
-                                'link_download' : 'download/' + str(i.id)}
-                        dbs.append(db)
+                        dbs.append(fill(i))
         else:
             dbs_raw = m.DB.objects.all()
             for i in dbs_raw:            
                 if (change_or_edit == "changed"):
                     if (i.change >= after and i.change <= before):
-                        db = {'name':i.name,'create':i.create,\
-                            'change':i.change,'link':'show/' + str(i.id),\
-                                'link_download' : 'download/' + str(i.id)}
-                        dbs.append(db)
+                        dbs.append(fill(i))
                 elif (change_or_edit == "created"):
                     if (i.create >= after and i.create <= before):
-                        db = {'name':i.name,'create':i.create,\
-                            'change':i.change,'link':'show/' + str(i.id),\
-                                'link_download' : 'download/' + str(i.id)}
-                        dbs.append(db)
+                        dbs.append(fill(i))
                 else:
-                    db = {'name':i.name,'create':i.create,\
-                            'change':i.change,'link':'show/' + str(i.id),\
-                                'link_download' : 'download/' + str(i.id)}
-                    dbs.append(db)
+                    dbs.append(fill(i))
         param = {'db':dbs}
         return render(request,"search_db.html",param)
 
+def delete(request,id):
+    try:
+        db = m.DB.objects.filter(id=id)[0]
+        db.delete()
+    except:
+        pass
+    return
 
 def db_show(request,id):
-    allCells = m.Cell.objects.filter(db = int(id))
+    try:
+        allCells = m.Cell.objects.filter(db = int(id))
+    except:
+        return render(request,"404.html")
+    #if not allCells:
+    #    return render(request,"404.html")
     maxColl = allCells.aggregate(Max('column'))["column__max"]
     maxRow = allCells.aggregate(Max('row'))["row__max"]
+    if maxColl is None:
+        maxColl = 10
+    if maxRow is None:
+        maxRow = 10
     res = []
     for i in range(1,maxRow + 1):
         row = []
@@ -91,22 +96,36 @@ def db_show(request,id):
                 cell = allCells.filter(row = i,column = j)[0]   
                 var = cell.Read()      
                 if var is not None:
-                    row.append(str(var))
+                    row.append({'val':str(var),'column':j, 'row':i})
                 else:
-                    row.append("")
+                    row.append({'val':"",'column':j, 'row':i})
             except:
-                row.append(" ")       
+                row.append({'val':"",'column':j, 'row':i})       
         res.append(row)
-    param = {"res" : res}
+
+    # Actions for a list
+    db = m.DB.objects.filter(id=int(id))[0]
+    act = {'name':db.name,'create':db.create,\
+                'change':db.change,\
+                'link_download' : 'download/' + str(db.id),\
+                'link_id' : str(db.id)}
+    param = {"res" : res,"act":act,"db_id":db.id}
     return render(request,"show.html", param)
 
+# Process existing or blank db
 def process(file):
     db = m.DB()
-    db.name = file.name 
+    if file is not None:
+        db.name = file.name 
+    else:
+        db.name = "Blank.xlsx"
     db.create = date.today()  
     db.change = db.create    
     db.save() 
-    wb = load_workbook(file)
+    if file is not None:
+        wb = load_workbook(file)
+    else:
+        return db.id
     ws = wb.active
     r = 1
     c = 1
@@ -126,24 +145,39 @@ def process(file):
 def changeCell(request):
     if request.method =="POST":
         row = request.POST["row"]
-        col = request.POST["col"]
+        column = request.POST["column"]
         var = request.POST["var"]
-        cell = m.Cell().objects.filter(row = row, column=col)
-        cell.Set(var)
-        cell.save()
+        db_id = request.POST["db_id"]
+        row = int(row)
+        column = int(column)
+        db_id = int(db_id)
+        try:
+            cell = m.Cell.objects.filter(row=row, column=column, db=db_id)[0]
+            cell.Set(var)
+            cell.save()
+        except:
+            cell = m.Cell()
+            cell.row = row
+            cell.column = column
+            cell.Set(var)
+            db = m.DB.objects.filter(id=db_id)[0]
+            cell.db = db
+            cell.save()
+    return HttpResponse(status=200)
     
 
 def upload(request):
-    if request.method =='POST' and request.FILES['excel_file']:
-        file = request.FILES['excel_file']
+    if request.method =='POST':
+        try:
+            file = request.FILES['excel_file']
+        except:
+            file = None
         db_id = process(file)
-        #fs = FileSystemStorage()
-        #filename = fs.save(file.name, file)
-        #uploaded_file_url = fs.url(filename)
         if request.POST["to_edit"]:
             return redirect('/show/' + str(db_id)) # go for an show and edit page
         else:
             return redirect('/')
+
 
 def download(request, id):
     db = m.DB.objects.filter(id=id)[0]
@@ -158,13 +192,13 @@ def download(request, id):
         maxColl = 0
     if maxRow is None:
         maxRow = 0
-    for i in range(1,maxRow + 1):
-        for j in range(1,maxColl + 1):
+    for row in range(1,maxRow + 1):
+        for coll in range(1,maxColl + 1):
             try:          
-                cell = allCells.filter(row = i,column = j)[0]   
+                cell = allCells.filter(row = row,column = coll)[0]   
                 var = cell.Read()      
                 if var is not None:
-                    ws.cell(column=i, row=j, value=var)
+                    ws.cell(column=coll, row=row, value=var)
                 else:
                     pass
             except:

@@ -1,26 +1,59 @@
 {% extends 'base.html'%}
 {% block content %}
+
+<script>
+  //Delete db
+  function init() {
+      // Delete on backend
+    $('.delete_class').click(function() {
+      $.ajax({
+        type: "POST",
+        url: "/delete/" + $(this).data( "id" ),
+        data: { csrfmiddlewaretoken : "{{ csrf_token }}"}
+      })
+      // Redirect to index
+        
+    });    
+  }
+  $( document ).ready(init);
+</script>  
+
 <h1>Database:</h1> 
 <script>
-    $("")
+  // Change cell
+  function init() {
+    $('.cell_edit').change(function() {
+      $.ajax({
+        type: "POST",
+        url: "/changeCell/",
+        data: { csrfmiddlewaretoken : "{{ csrf_token }}",row:$(this).data("row"),
+                column:$(this).data("column"), var:$(this).val(),db_id:"{{db_id}}"}
+      })
+    });    
+  }
+  $( document ).ready(init);
 </script>  
-<form action="changeCell">
-  <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
-      {% for row in res %}    
-        <tr>
-        {% for val in row %}
-        <!-- changeCell/ -->
-          <!-- <td class="mdl-data-table__cell editField">{{val}}</td> -->
-          <td class="mdl-data-table__cell editField">
-            <input class="mdl-textfield__input" type="text" id="sample1" value="{{val}}">
-          </td>
-        {% endfor %}
-        </tr>
+
+<table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+    {% for row in res %}    
+      <tr>
+      {% for i in row %}
+      <!-- changeCell/ -->
+        <!-- <td class="mdl-data-table__cell editField">{{val}}</td> -->
+        <td class="mdl-data-table__cell editField">
+          <input class="cell_edit mdl-textfield__input" type="text" id="" value="{{i.val}}" data-row="{{i.row}}" data-column="{{i.column}}"/>
+        </td>
       {% endfor %}
-  </table> 
-  <div class="card-square  mdl-shadow--2dp">
-    <input type="submit" value="Save" class="mdl-button mdl-js-button mdl-button--raised">
-  </div>
-</form>
+      </tr>
+    {% endfor %}
+</table> 
+<div id="div_{{act.link_id}}">
+  name: {{act.name}} 
+  created: {{act.create}} 
+  modified: {{act.change}}
+  <a href="/{{act.link}}">View & Edit</a>
+  <a href="/{{act.link_download}}">Download</a>      
+  <a class="delete_class" data-id="{{act.link_id}}">Delete</a>
+</div>
 
 {% endblock %}
