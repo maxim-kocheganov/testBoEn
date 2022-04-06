@@ -31,5 +31,31 @@
 `python3 manage.py runserver`
 
 ### linux (Ubuntu) - production
-Do everuthing as priviously done + deploy on prod
-(TODO)
+Do everuthing as priviously done, exept running test server
+
+12) apply updates 
+`sudo apt apdate`, `sudo apt upgrade`
+13) install Postresql `sudo apt install postgresql`
+14) check it's installation
+```
+sudo systemctl is-active postgresql
+sudo systemctl is-enabled postgresql
+sudo systemctl status postgresql
+```
+15) confirm readiness
+`sudo pg_isready`
+16) log in as pq user and run shell
+```
+sudo su - postgres
+psql
+```
+17) create user and db
+```
+CREATE USER user WITH PASSWORD 'pass';
+CREATE DATABASE test;
+GRANT ALL PRIVILEGES ON DATABASE test to user;
+\q
+```
+18) exit from user
+`exit`
+19) 
