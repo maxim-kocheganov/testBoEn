@@ -121,4 +121,11 @@ sudo apache2ctl configtest
 ```
 31) reload apache
 `sudo systemctl restart apache2`
-32) PROFIT!!
+32) go to /home/user/testBoEn/exeldb and create a dir `media`
+```
+cd /home/user/testBoEn/exeldb
+mkdir media
+chmod 777 media
+```
+33) ....
+34) PROFIT!!!

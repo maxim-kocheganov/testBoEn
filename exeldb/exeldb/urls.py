@@ -19,12 +19,13 @@ from table import views as tw
 
 urlpatterns = [
     path('admin/', admin.site.urls),    
-    path('search/', tw.bd_search),
+    path('search/', tw.db_search),
     path('show/<id>', tw.db_show),
     path('upload/', tw.upload),
     path('changeCell/', tw.changeCell),    
     path('download/<id>', tw.download),
     path('delete/<id>', tw.delete),
     path('changeName/', tw.changeName),
+    path('login/', tw.login),
     path('', tw.index),
 ]

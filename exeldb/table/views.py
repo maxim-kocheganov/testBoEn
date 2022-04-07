@@ -11,11 +11,12 @@ import pytz
 import os
 from django.conf import settings
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
 
 def index(request):
     return render(request, "index.html")
 
-def bd_search(request):
+def db_search(request):
     def fill(i):
         if (i.change >= after and i.change <= before):
             db = {'name':i.name,'create':i.create,\
@@ -89,8 +90,8 @@ def delete(request,id):
         db = m.DB.objects.filter(id=id)[0]
         db.delete()
     except:
-        pass
-    return
+        return HttpResponse(status=500)
+    return HttpResponse(status=200)
 
 def db_show(request,id):
     try:
@@ -242,6 +243,29 @@ def download(request, id):
     response = HttpResponse(file.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response['Content-Disposition'] = 'attachment; filename={0}'.format(name)
     return response
+
+def login(request):
+    if request.method =='GET':
+        return render(request,"login.html")
+    elif request.method =='POST':
+        from django.contrib.auth import authenticate
+        user = authenticate(username='john', password='secret')
+        if user is not None:
+            # A backend authenticated the credentials
+            pass
+        else:
+            # No backend authenticated the credentials
+            pass
+        
+
+def register(request):
+    if request.method =='GET':
+        return render(request,"register.html")
+    elif request.method =='POST':
+        login = request.POST["login"]
+        password = request.POST["password"]
+        user = User.objects.create_user(user=login,password=password)
+        user.save()
 
 # Прервись чтением исходников, уважаемый, лови анекдот:
 # Байден выступает перед журналистами:
