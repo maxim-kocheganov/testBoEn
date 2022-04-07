@@ -88,11 +88,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 ```
 SECRET_KEY = 'random instead'
 ```
-25) Create Django's superuser
+26) turn off debug mode in  exeldb/settings.py
+`DEBUG = True`
+27) Create Django's superuser
 `python3 manage.py createsuperuser`
-26) Collect project's static
+28) Collect project's static
 `python3 manage.py collectstatic`
-27) Change /etc/apache2/sites-available/000-default.conf to
+29) Change /etc/apache2/sites-available/000-default.conf to
 ```
 <VirtualHost *:80>
 	Alias /static /home/user/testBoEn/exeldb/static
@@ -113,10 +115,10 @@ SECRET_KEY = 'random instead'
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
-28) check config
+30) check config
 ```
 sudo apache2ctl configtest
 ```
-29) reload apache
+31) reload apache
 `sudo systemctl restart apache2`
-30) PROFIT!!
+32) PROFIT!!
