@@ -106,7 +106,6 @@ SECRET_KEY = 'random instead'
 		Require all granted
 	</Directory>
 
-	ErrorLog  /home/user/testBoEn/exeldb/exeldb/logs/error.log
 	WSGIDaemonProcess exeldb python-home=/home/user/testBoEn/.env python-path=/home/user/testBoEn/exeldb
 	WSGIProcessGroup exeldb
 	WSGIScriptAlias / /home/user/testBoEn/exeldb/exeldb/wsgi.py

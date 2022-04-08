@@ -47,7 +47,7 @@ class Cell(models.Model):
 """
 
 class Cell(models.Model):    
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     row = models.IntegerField()
     column = models.IntegerField()
     type = models.IntegerField(blank=True, null=True)
