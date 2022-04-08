@@ -89,7 +89,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 SECRET_KEY = 'random instead'
 ```
 26) turn off debug mode in  exeldb/settings.py
-`DEBUG = True`
+`DEBUG = False`
 27) Create Django's superuser
 `python3 manage.py createsuperuser`
 28) Collect project's static
